@@ -1,0 +1,60 @@
+#
+# configuration for our jolokia checks
+#
+# 05.06.2015 - Bodo Schulz
+#
+#
+
+# ----------------------------------------------------------------------------------------
+
+TEMPLATE_DIR="/usr/share/jolokia"
+
+standardJMX="TomcatThreadPool Threading Service Memory ClassLoading GarbageCollector"
+
+# Coremedia specific:
+JMX_20099="${standardJMX} AOVGWortService" # addons-vgwort
+JMX_21099="${standardJMX} AOVideoFeedImporter AOVideoUpdateWatcher AOVideoService AOVideoService_VideoStorage AOVideoStats" # addons-video
+JMX_35099="${standardJMX}" # taxonomy
+JMX_36099="${standardJMX}" # migration
+JMX_37099="${standardJMX}" # importer
+JMX_38099="${standardJMX} CMCAEBlobCache" # preview-cae
+JMX_40099="${standardJMX} CMStudioCapConnection" # studio
+JMX_41099="${standardJMX} CMServer CMContentFeeder CMConnectionPool CMQueryPool CMStatisticsJobResult CMStatisticsRepository CMStatisticsResourceCache CMStatisticsTextStore CMStatisticsPublisher " # cms
+JMX_42099="${standardJMX} CMServer CMConnectionPool CMQueryPool CMStatisticsJobResult CMStatisticsRepository CMStatisticsResourceCache CMStatisticsTextStore" # mls
+JMX_44099="${standardJMX} SolrReplicationHandler" # solr-master
+JMX_45099="${standardJMX} SolrReplicationHandler" # solr-slave
+JMX_46099="${standardJMX} CMCAEFeederHealth CMCAEFeederProactiveEngine CMContentDependencyInvalidator" # feeder preview
+JMX_47099="${standardJMX} CMCAEFeederHealth CMCAEFeederProactiveEngine CMContentDependencyInvalidator" # feeder live
+JMX_48099="${standardJMX} CMServer CMConnectionPool CMQueryPool CMStatisticsJobResult CMStatisticsRepository CMStatisticsResourceCache CMStatisticsTextStore CMRLSReplicator" # rls
+JMX_49099="${standardJMX} CMCAECacheContentBeans CMCAEBlobCache" # cae
+
+# nach wie vielen Tagen soll der check neu gebaut werden
+MAX_JSON_TIME=4
+
+JOLOKIA_PORT_CACHE="/var/cache/monitor/jolokia.port.cache"
+
+# ----------------------------------------------------------------------------------------
+
+getRunningApplications() {
+
+  echo "OBSOLETE!"
+  echo "you want import the JOLOKIA_PORT_CACHE var!"
+
+  . ${JOLOKIA_PORT_CACHE}
+
+  return
+
+  PORTS=
+  local PIDS=
+
+  touch ${JOLOKIA_PORT_CACHE}
+  chown coremedia: ${JOLOKIA_PORT_CACHE}
+
+  PORTS=$(lsof -i | grep 099 | grep LISTEN | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}')
+
+  PORTS=${PORTS#","}
+  PORTS="$(echo ${PORTS} | sed 's|,| |g')"
+  echo "PORTS=\"${PORTS}\"" > ${JOLOKIA_PORT_CACHE}
+}
+
+# ----------------------------------------------------------------------------------------

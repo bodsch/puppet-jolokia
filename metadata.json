@@ -1,0 +1,36 @@
+{
+  "name": "bodsch-jolokia",
+  "version": "1.0.0",
+  "author": "bodsch",
+  "summary": "Installs, deploys, and configures Jolokia Web App for Apache Tomcat",
+  "license": "GPLv3",
+  "source": "http://github.com/bodsch/puppet-jolokia",
+  "project_page": "https://github.com/bodsch/puppet-jolokia",
+  "dependencies": [
+    {"name":"puppetlabs/stdlib","version_requirement":">= 4.2.0 < 5.0.0"},
+    {"name":"puppetlabs/concat","version_requirement":">= 1.0.4 < 2.0.0"},
+    {"name":"nanliu/staging","version_requirement":">= 0.4.1 < 2.0.0"},
+    {"name":"puppetlabs/tomcat","version_requirement":">= 1.3.0"},
+    {"name":"maestrodev/wget", "version": "1.7.0"}
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "6"
+      ]
+    },
+    {
+      "operatingsystem": "CentOS",
+      "operatingsystemrelease": [
+        "6"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 3.0.0 < 2015.3.0"
+    }
+  ]
+}

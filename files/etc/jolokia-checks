@@ -1,0 +1,81 @@
+#!/bin/sh
+#
+# Startup script for the jolokia checks
+#
+# chkconfig: - 99 50
+# description: This script starts our jolokia checks
+# processname: jolokia-checks
+# pidfile: /var/run/jolokia-checks.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+# . /etc/sysconfig/network
+
+# Check that networking is up.
+# [ ${NETWORKING} = "no" ] && exit 0
+
+jolokia=/usr/local/sbin/jolokia_checks.sh
+[ -f $jolokia ] || exit 0
+
+RETVAL=0
+
+PIDFILE="/var/run/jolokia-checks.pid"
+
+# See how we were called.
+case "$1" in
+  start)
+    if [ $UID -ne 0 ]
+    then
+      echo "User has insufficient privilege."
+      exit 4
+    fi
+    echo -n "Starting jolokia-checks: "
+
+    ${jolokia} --daemon &
+
+    PID=$(pidof -x ${jolokia})
+
+    if [ -z ${PID} ]
+    then
+      printf "%s\n" "Fail"
+    else
+      echo ${PID} > ${PIDFILE}
+      printf "%s\n" "Ok"
+      touch /var/lock/subsys/jolokia-checks
+    fi
+    ;;
+  stop)
+    if test "x$(pidfileofproc jolokia-checks)" != x; then
+      echo -n "Shutting down jolokia-checks: "
+      killproc jolokia-checks
+    fi
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/jolokia-checks $PIDFILE
+    ;;
+  status)
+    status -p $PIDFILE jolokia-checks
+    RETVAL=$?
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    RETVAL=$?
+    ;;
+  condrestart)
+    if test "x$(pidfileofproc jolokia-checks)" != x; then
+      $0 stop
+      sleep 2s
+      $0 start
+      RETVAL=$?
+    fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|condrestart|status}"
+    exit 2
+esac
+
+exit $RETVAL
+
